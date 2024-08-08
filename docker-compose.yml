@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  jira:
+    extends:
+      file: jira.yml
+      service: jira
+
+  confluence:
+    extends:
+      file: confluence.yml
+      service: confluence
+
+  db:
+    extends:
+      file: db.yml
+      service: db
+
+  nfs:
+    extends:
+      file: nfs.yml
+      service: nfs
+
+  nginx:
+    extends:
+      file: nginx.yml
+      service: nginx
+
+volumes:
+  jira_data:
+  confluence_data:
+  postgres_data:
+  nfs_data:

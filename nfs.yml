@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  nfs:
+    image: itsthenetwork/nfs-server-alpine:latest
+    environment:
+      - SHARED_DIRECTORY=/nfsshare
+    volumes:
+      - type: volume
+        source: nfs_data
+        target: /nfsshare

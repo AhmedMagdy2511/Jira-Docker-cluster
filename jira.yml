@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  jira:
+    image: atlassian/jira-software:latest
+    volumes:
+      - type: volume
+        source: jira_data
+        target: /var/atlassian/application-data/jira
+      - type: volume
+        source: nfs_data
+        target: /var/atlassian/application-data/jira/shared-home
+    environment:
+      - ATL_JDBC_URL=jdbc:postgresql://db:5432/jiradb
+      - ATL_JDBC_USER=jirauser
+      - ATL_JDBC_PASSWORD=P@ssw0rd
+      - ATL_DB_TYPE=postgres72
+    depends_on:
+      db:
+        condition: service_healthy
+      nfs:
+        condition: service_started
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 1m
+      restart_policy:
+        condition: on-failure

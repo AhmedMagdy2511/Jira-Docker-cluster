@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest  # Uses the latest PostgreSQL image
+    environment:
+      - POSTGRES_DB=jiradb  # Database name for Jira
+      - POSTGRES_USER=jirauser  # Database user for Jira
+      - POSTGRES_PASSWORD=jirapassword  # Database password for Jira
+      - POSTGRES_DB=confluencedb  # Database name for Confluence
+      - POSTGRES_USER=confluenceuser  # Database user for Confluence
+      - POSTGRES_PASSWORD=confluencepassword  # Database password for Confluence
+    volumes:
+      - type: volume
+        source: postgres_data  # Mounts the PostgreSQL data volume
+        target: /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]  # Checks if PostgreSQL is ready
+      interval: 30s  # Runs the health check every 30 seconds
+      timeout: 10s  # Times out after 10 seconds
+      retries: 5  # Retries 5 times before marking the service as unhealthy
