@@ -1,3 +1,4 @@
+version: '3.8'
 
 services:
   nfs:
@@ -8,8 +9,3 @@ services:
       - type: volume
         source: nfs_data
         target: /nfsshare
-    # networks:
-    #   - host
-# networks:
-#   host:
-#     external: true
