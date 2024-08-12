@@ -1,0 +1,43 @@
+
+version: '3.8'
+
+services:
+  jira:
+    image: atlassian/jira-software:9.4.23
+    ports:
+      - "8080:8080"
+    environment:
+      - JVM_SUPPORT_RECOMMENDED_ARGS=-Dupm.plugin.upload.enabled=true
+      - JVM_MINIMUM_MEMORY=1G
+      - JVM_MAXIMUM_MEMORY=2G
+      - CLUSTERED=true
+      - JIRA_NODE_ID=${HOSTNAME}
+      - EHCACHE_PEER_DISCOVERY=automatic
+      - cacheManagerPeerProviderFactory=net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory
+      - JIRA_SHARED_HOME=/var/atlassian/application-data/jira/shared-home
+      - ATL_JDBC_URL=jdbc:sqlserver://;serverName=10.96.107.57;portNumber=1433;databaseName=jira
+      - ATL_JDBC_USER=sa
+      - ATL_JDBC_PASSWORD=P@ssw0rd
+      - ATL_DB_DRIVER=com.microsoft.sqlserver.jdbc.SQLServerDriver
+      - ATL_DB_TYPE=mssql
+      - ATL_DB_SCHEMA_NAME=dbo
+    volumes:
+      - jira_data:/var/atlassian/application-data/jira
+      - jira_shared_home:/var/atlassian/application-data/jira/shared-home
+    deploy:
+      resources:
+        limits:
+          cpus: '3'
+          memory: 4G
+        reservations:
+          cpus: '2'
+          memory: 2G
+    entrypoint: >
+      sh -c "
+      chown -R 2001:2001 /var/atlassian/application-data/jira &&
+      chown -R 2001:2001 /var/atlassian/application-data/jira/shared-home &&
+      /entrypoint.sh"
+
+volumes:
+  jira_data:
+  jira_shared_home:

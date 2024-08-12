@@ -1,0 +1,64 @@
+
+services:
+  jira:
+    image: atlassian/jira-software:latest
+    links:
+      - db
+      - nginx
+      - nfs
+    expose:
+      - 8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: volume
+        source: jira_data
+        target: /var/atlassian/application-data/jira
+      - type: volume
+        source: nfs_data
+        target: /var/atlassian/application-data/jira/shared-home
+      # - ./jira-cacerts:/var/atlassian/application-data/jira/cacerts:rw
+      # - ./jira-cacerts:/var/atlassian/application-data/jira/cacerts:rw
+      # - ./jira-server.xml:/opt/atlassian/jira/conf/server.xml:ro
+    environment:
+      - ATL_JDBC_URL=jdbc:postgresql://db:5432/jiradb
+      - ATL_JDBC_USER=jirauser
+      - ATL_JDBC_PASSWORD=P@ssw0rd
+      - ATL_DB_DRIVER=org.postgresql.Driver
+      - ATL_DB_TYPE=postgres72
+      - JVM_SUPPORT_RECOMMENDED_ARGS="-Dupm.plugin.upload.enabled=true  -Djira.downgrade.allowed=true"
+      - CLUSTERED=true
+      - JIRA_NODE_ID=jira
+      - EHCACHE_LISTENER_HOSTNAME=jira
+      - EHCACHE_LISTENER_PORT=40001
+      - EHCACHE_OBJECT_PORT=40011
+      - EHCACHE_PEER_DISCOVERY=default
+  
+      - JIRA_SHARED_HOME=/var/atlassian/application-data/jira/shared-home
+      # - 'JVM_SUPPORT_RECOMMENDED_ARGS=-Djavax.net.ssl.trustStore=/var/atlassian/application-data/jira/cacerts'
+      - HTTP_PROXY="http://localhost:80"
+      
+    depends_on:
+      db:
+        condition: service_healthy
+      nfs:
+        condition: service_started
+
+    entrypoint: >
+      sh -c "
+      chown -R 2001:2001 /var/atlassian/application-data/jira &&
+      chown -R 2001:2001 /var/atlassian/application-data/jira/shared-home &&
+      /entrypoint.py"
+    
+  # networks:
+  #   macvlan_network:
+  #     driver: macvlan
+  #     driver_opts:
+  #       parent: eth0
+  #     ipam:
+  #       config:
+  #         - subnet: 192.168.1.0/24
+  #           gateway: 192.168.1.1
+# networks:
+#   host:
+#     external: true

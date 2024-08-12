@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  jira:
+    extends:
+      file: jira.yml
+      service: jira
+
+  jira-node2:
+    extends:
+      file: jira-node2.yml
+      service: jira-node2
+
+  db:
+    extends:
+      file: db.yml
+      service: db
+
+
+  nfs:
+    extends:
+      file: nfs.yml
+      service: nfs
+
+
+  nginx:
+    extends:
+      file: nginx.yml
+      service: nginx
+
+
+volumes:
+  jira_data:
+  jira_data2:
+  postgres_data:
+  nfs_data:
+  
